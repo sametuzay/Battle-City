@@ -4,10 +4,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
-/**
- * Orijinal NES tarzında tasarlanmış Ana Menü Paneli.
- * Kullanıcıların yön tuşları veya WASD ile seçim yapmasını sağlar.
- */
 public class MainMenuPanel extends JPanel {
     
     private final String[] options = {
@@ -20,7 +16,6 @@ public class MainMenuPanel extends JPanel {
     
     private int selectedIndex = 0;
     
-    // Seçim yapıldığında üst pencereye (GameFrame) haber vermek için callback arayüzü
     public interface MenuSelectionListener {
         void onSelect(int index);
     }
@@ -30,13 +25,11 @@ public class MainMenuPanel extends JPanel {
         setPreferredSize(new Dimension(528, 480));
         setFocusable(true);
         
-        // Klavye olaylarını dinleyen anonim iç sınıf
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 int key = e.getKeyCode();
                 
-                // Yukarı hareket (W veya Yukarı Ok)
                 if (key == KeyEvent.VK_UP || key == KeyEvent.VK_W) {
                     selectedIndex--;
                     if (selectedIndex < 0) {
@@ -44,7 +37,6 @@ public class MainMenuPanel extends JPanel {
                     }
                     repaint();
                 }
-                // Aşağı hareket (S veya Aşağı Ok)
                 else if (key == KeyEvent.VK_DOWN || key == KeyEvent.VK_S) {
                     selectedIndex++;
                     if (selectedIndex >= options.length) {
@@ -52,7 +44,6 @@ public class MainMenuPanel extends JPanel {
                     }
                     repaint();
                 }
-                // Seçimi onaylama (Enter veya Boşluk)
                 else if (key == KeyEvent.VK_ENTER || key == KeyEvent.VK_SPACE) {
                     if (listener != null) {
                         listener.onSelect(selectedIndex);
@@ -66,11 +57,9 @@ public class MainMenuPanel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
-        // Logoyu ekrana ortalayacak şekilde çizdiriyoruz
         int logoW = 198;
-        int logoH = 96; // Sadece BATTLE CITY yazan kısım
+        int logoH = 96;
         
-        // Genişlik yeterliyse 1.5 kat ölçekliyoruz
         double scale = 1.0;
         if (getWidth() >= 400) {
             scale = 1.5;
@@ -86,10 +75,9 @@ public class MainMenuPanel extends JPanel {
             g.drawImage(ImageLoader.gameLogo, logoX, logoY, drawW, drawH, null);
         }
         
-        // Seçenekleri yazdırıyoruz
         g.setFont(new Font("Monospaced", Font.BOLD, 18));
         int startY = logoY + drawH + 45;
-        int startX = (getWidth() - 200) / 2; // Metinleri kabaca ortalamak için
+        int startX = (getWidth() - 200) / 2;
         if (startX < 150) {
             startX = 150;
         }
@@ -99,7 +87,6 @@ public class MainMenuPanel extends JPanel {
             if (i == selectedIndex) {
                 g.setColor(Color.WHITE);
                 
-                // Seçili seçeneğin soluna dinamik tank imlecini çiziyoruz
                 if (ImageLoader.playerTank != null && ImageLoader.playerTank[Direction.RIGHT.ordinal()][0] != null) {
                     g.drawImage(ImageLoader.playerTank[Direction.RIGHT.ordinal()][0], startX - 35, optionY - 17, 24, 24, null);
                 } else {

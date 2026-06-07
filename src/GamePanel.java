@@ -16,7 +16,7 @@ public class GamePanel extends JPanel implements Runnable {
     private int currentLevel = 1;
     private final int MAX_LEVELS = 3;
     private boolean isGameOver = false;
-    private boolean isVictory = false; // Zafer ekranı bayrağı
+    private boolean isVictory = false;
     private boolean isCustomMap = false;
     private String customMapPath = "";
     private int cumulativeScore = 0;
@@ -31,14 +31,12 @@ public class GamePanel extends JPanel implements Runnable {
     private List<EnemyTank> enemies;
     private List<SpawnIndicator> spawnIndicators;
     private List<Powerup> powerups;
-    private List<Explosion> explosions; // Aktif patlamalar listesi
+    private List<Explosion> explosions;
     private Difficulty difficulty = Difficulty.MEDIUM;
 
-    // Saat (Freeze) powerup: Düşmanlar dondurulmuş mu ve ne zamana kadar?
     private boolean enemiesFrozen = false;
     private long freezeEndTime = 0;
 
-    // Kazma (Shovel) powerup: Üssün etrafı geçici çelik yapıldı mı?
     private boolean shovelActive = false;
     private long shovelEndTime = 0;
 
@@ -84,15 +82,13 @@ public class GamePanel extends JPanel implements Runnable {
                     if (key == KeyEvent.VK_D || key == KeyEvent.VK_RIGHT)
                         rightPressed = true;
                     if (key == KeyEvent.VK_SPACE) {
-                        // Sadece oyuncuya ait aktif mermileri sayıyoruz ki düşman mermileri oyuncuyu
-                        // engellemesin
+                        // Düşman mermileri oyuncunun atış hakkını yemesin.
                         int playerBulletCount = 0;
                         for (Bullet b : bullets) {
                             if (!b.isEnemy) {
                                 playerBulletCount++;
                             }
                         }
-                        // Maksimum mermi sayısı: Yıldız powerup aktifken 2, değilse 1
                         if (!isPaused && playerBulletCount < player.maxBullets) {
                             bullets.add(player.fireBullet());
                         }
@@ -158,7 +154,7 @@ public class GamePanel extends JPanel implements Runnable {
 
         player.setMoving(playerMoving);
         player.updateAnimation();
-        player.updateShieldAnimation(); // Kalkan animasyonunu güncelle
+        player.updateShieldAnimation();
 
         if (enemiesSpawned == 20 && enemies.isEmpty() && spawnIndicators.isEmpty()) {
             if (isCustomMap) {
@@ -169,13 +165,11 @@ public class GamePanel extends JPanel implements Runnable {
                 currentLevel++;
                 loadLevel(currentLevel);
             } else if (currentLevel == MAX_LEVELS) {
-                // Son seviye tamamlandı, zafer!
                 isVictory = true;
                 saveScore();
             }
         }
 
-        // Doğuş göstergelerini güncelle ve süresi dolanları düşmana dönüştür
         synchronized (this) {
             Iterator<SpawnIndicator> it = spawnIndicators.iterator();
             while (it.hasNext()) {
@@ -191,14 +185,12 @@ public class GamePanel extends JPanel implements Runnable {
         spawnEnemy();
         updateEnemies();
         updatePowerups();
-        updateExplosions(); // Patlamaları güncelle
+        updateExplosions();
 
-        // Saat powerup süresi dolmuşsa düşmanları tekrar hareket ettir
         if (enemiesFrozen && System.currentTimeMillis() > freezeEndTime) {
             enemiesFrozen = false;
         }
 
-        // Kazma powerup süresi dolmuşsa üssün etrafındaki çelik duvarları kaldır
         if (shovelActive && System.currentTimeMillis() > shovelEndTime) {
             removeShovelWalls();
             shovelActive = false;
@@ -216,7 +208,6 @@ public class GamePanel extends JPanel implements Runnable {
             g.drawImage(eagleImg, playerBase.getX(), playerBase.getY(), playerBase.getWidth(),
                     playerBase.getHeight(), this);
 
-            // Çalı (Bush) dışındaki engelleri tankların altında kalması için önce çiziyoruz
             for (GameObject obj : obstacles) {
                 if (obj instanceof BrickWall) {
                     BrickWall brick = (BrickWall) obj;
@@ -243,34 +234,28 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
-            // Oyuncu Tankı çizimi
             if (player != null) {
                 BufferedImage currentTankImage = ImageLoader.playerTank[player.getDirection().ordinal()][player
                         .getAnimFrame()];
                 g.drawImage(currentTankImage, player.getX(), player.getY(), player.getWidth(), player.getHeight(),
                         this);
 
-                // Oyuncu kalkanı/doğuş koruması çizimi (NES Sprites) - Mükemmel ortalama için
-                // genişletildi
                 if (player.isShielded()) {
                     BufferedImage shieldImg = ImageLoader.shieldSprites[player.getShieldFrame()];
                     g.drawImage(shieldImg, player.getX() - 4, player.getY() - 4, player.getWidth() + 8,
                             player.getHeight() + 8, this);
                 }
             }
-            // Düşman Tankları çizimi
             for (EnemyTank enemy : enemies) {
                 BufferedImage enemyImage = ImageLoader.enemyTank[enemy.getDirection().ordinal()][enemy.getAnimFrame()];
                 g.drawImage(enemyImage, enemy.getX(), enemy.getY(), enemy.getWidth(), enemy.getHeight(), this);
             }
 
-            // Düşman Doğuş Yıldızlarını çizdir
             for (SpawnIndicator si : spawnIndicators) {
                 BufferedImage frame = ImageLoader.spawnStar[si.getFrame()];
                 g.drawImage(frame, si.getX(), si.getY(), si.getWidth(), si.getHeight(), this);
             }
 
-            // Powerup'ları çizdir (yanıp sönerek)
             for (Powerup pu : powerups) {
                 if (pu.isVisible()) {
                     BufferedImage puImg = ImageLoader.powerupSprites[pu.getSpriteIndex()];
@@ -278,20 +263,17 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
-            // Patlamaları çizdir
             for (Explosion exp : explosions) {
                 BufferedImage expImg = ImageLoader.explosionSprites[exp.getFrame()];
                 g.drawImage(expImg, exp.getX(), exp.getY(), exp.getWidth(), exp.getHeight(), this);
             }
 
-            // Mermileri çizdir
             for (Bullet b : bullets) {
                 BufferedImage bulletImg = ImageLoader.bullets[b.getDirection().ordinal()];
                 g.drawImage(bulletImg, b.getX(), b.getY(), b.getWidth(), b.getHeight(), this);
             }
 
-            // Orijinal oyundaki gibi çalıları (Bush) tankların üstünü örtmesi için en son
-            // çiziyoruz
+            // Battle City'de çalılar tankların üstünü örter.
             for (GameObject obj : obstacles) {
                 if (obj instanceof Bush) {
                     g.drawImage(ImageLoader.bush, obj.getX(), obj.getY(), obj.getWidth(), obj.getHeight(), this);
@@ -334,9 +316,9 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             try {
-                Thread.sleep(16);// 1000/60'Tan geliyor, 16 ms, 60fps.
+                Thread.sleep(16);
 
-            } catch (InterruptedException e) {// sleepteyken bozulursa
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -359,7 +341,6 @@ public class GamePanel extends JPanel implements Runnable {
         Rectangle hitBox = new Rectangle(nextX + padding, nextY + padding, tank.getWidth() - 2 * padding,
                 tank.getHeight() - 2 * padding);
 
-        // Anlık çakışmaları da engellemek için mevcut tankın kendi sınır kutusu
         Rectangle currentBox = new Rectangle(tank.getX() + padding, tank.getY() + padding,
                 tank.getWidth() - 2 * padding,
                 tank.getHeight() - 2 * padding);
@@ -376,9 +357,7 @@ public class GamePanel extends JPanel implements Runnable {
             return true;
         }
 
-        // --- Tank-Tank Çarpışma Kontrolleri ---
         if (tank instanceof PlayerTank) {
-            // Oyuncu düşman tanklarına çarpıyor mu?
             for (EnemyTank enemy : enemies) {
                 Rectangle enemyBox = new Rectangle(enemy.getX() + padding, enemy.getY() + padding,
                         enemy.getWidth() - 2 * padding, enemy.getHeight() - 2 * padding);
@@ -387,7 +366,6 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
         } else if (tank instanceof EnemyTank) {
-            // Düşman oyuncuya çarpıyor mu?
             if (player != null) {
                 Rectangle playerBox = new Rectangle(player.getX() + padding, player.getY() + padding,
                         player.getWidth() - 2 * padding, player.getHeight() - 2 * padding);
@@ -395,13 +373,11 @@ public class GamePanel extends JPanel implements Runnable {
                     return true;
                 }
             }
-            // Düşman diğer düşman tanklarına çarpıyor mu?
             for (EnemyTank otherEnemy : enemies) {
                 if (tank != otherEnemy) {
                     Rectangle otherBox = new Rectangle(otherEnemy.getX() + padding, otherEnemy.getY() + padding,
                             otherEnemy.getWidth() - 2 * padding, otherEnemy.getHeight() - 2 * padding);
-                    // Düşmanlar birbirini kilitlemesin diye sadece gideceği yönü (hitBox) kontrol
-                    // ediyoruz
+                    // Düşmanlar birbirini kilitlemesin diye sadece ileri hitbox'a bakıyoruz.
                     if (hitBox.intersects(otherBox)) {
                         return true;
                     }
@@ -438,7 +414,6 @@ public class GamePanel extends JPanel implements Runnable {
                         if (bBox.intersects(bullet.getBounds())) {
                             hit = true;
                             bulletsToRemove.add(bullet);
-                            // Mermilerin havada çarpışması (küçük patlama)
                             explosions.add(new Explosion(b.getX(), b.getY(), false));
                             break;
                         }
@@ -450,20 +425,17 @@ public class GamePanel extends JPanel implements Runnable {
                 playerBase.isDestroyed = true;
                 isGameOver = true;
                 hit = true;
-                // Kartal yok edilince büyük patlama oluşur
                 explosions.add(new Explosion(playerBase.getX(), playerBase.getY(), true));
                 saveScore();
             }
-            if (!hit && b.isEnemy && bBox.intersects(player.getBounds())) {// oyuncunun vurulma mekaniği
+            if (!hit && b.isEnemy && bBox.intersects(player.getBounds())) {
                 if (player.isShielded()) {
-                    // Oyuncu kalkanlıysa zarar görmez, mermi patlar/yok olur
                     hit = true;
                 } else {
                     player.lives--;
                     if (listener != null)
                         listener.onLivesChanged(player.lives);
 
-                    // Oyuncu vurulunca büyük patlama oluşur
                     explosions.add(new Explosion(player.getX(), player.getY(), true));
 
                     if (player.lives <= 0) {
@@ -472,8 +444,8 @@ public class GamePanel extends JPanel implements Runnable {
                     } else {
                         player.x = 128;
                         player.y = 384;
-                        player.resetStarLevel(); // Oyuncu ölünce yıldız seviyesi sıfırlanır
-                        player.activateShield(3000); // Yeniden doğunca 3 saniye kalkan verilir
+                        player.resetStarLevel();
+                        player.activateShield(3000);
                     }
                     hit = true;
                 }
@@ -488,9 +460,7 @@ public class GamePanel extends JPanel implements Runnable {
                         int currentScore = getScore();
                         if (listener != null)
                             listener.onScoreChanged(currentScore);
-                        // Düşman yok edilince büyük patlama oluşur
                         explosions.add(new Explosion(enemy.getX(), enemy.getY(), true));
-                        // %40 ihtimalle düşman öldürülünce powerup bırak
                         trySpawnPowerup(enemy.getX(), enemy.getY());
                         hit = true;
                         break;
@@ -499,9 +469,8 @@ public class GamePanel extends JPanel implements Runnable {
 
             }
 
-            if (b.x < 0 || b.x > 416 || b.y < 0 || b.y > 416) {// harita sınırı kontrolü
+            if (b.x < 0 || b.x > 416 || b.y < 0 || b.y > 416) {
                 hit = true;
-                // Duvara/Sınıra çarpınca küçük patlama
                 explosions.add(new Explosion(b.getX(), b.getY(), false));
             }
             if (!hit) {
@@ -511,7 +480,6 @@ public class GamePanel extends JPanel implements Runnable {
 
                     if (b.getBounds().intersects(obj.getBounds())) {
                         hit = true;
-                        // Engele çarptığında küçük patlama
                         explosions.add(new Explosion(b.getX(), b.getY(), false));
 
                         if (obj instanceof BrickWall) {
@@ -525,7 +493,6 @@ public class GamePanel extends JPanel implements Runnable {
                                 obstacleToRemove = obj;
                             }
                         } else if (obj instanceof SteelWall) {
-                            // Mermi çelik kırıcı güce sahipse çelik duvarı yok et
                             if (b.destroysSteel) {
                                 obstacleToRemove = obj;
                             }
@@ -544,7 +511,6 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void updateEnemies() {
-        // Saat (Freeze) powerup aktifken düşmanlar hareket etmez ve ateş etmez
         if (enemiesFrozen) {
             return;
         }
@@ -554,7 +520,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         for (EnemyTank enemy : enemies) {
             if (checkCollision(enemy, enemy.direction)) {
-                // Çarpışma oldu, açık bir yön bulana kadar dene (Maksimum 4 deneme)
                 boolean pathFound = false;
                 int attempts = 0;
                 while (!pathFound && attempts < 4) {
@@ -566,11 +531,8 @@ public class GamePanel extends JPanel implements Runnable {
                 }
                 enemy.setMoving(false);
             } else {
-                // Çarpışma yoksa hareket et
                 enemy.move();
                 enemy.setMoving(true);
-                // Düz yolda giderken ara sıra (%1 şansla) doğal hedef seçimi yapsın
-                // (yalpalamayı önlemek için düşük tutulur)
                 if (rng.nextInt(100) < 1) {
                     enemy.randomMovement(baseX, baseY, player.getX(), player.getY());
                 }
@@ -583,7 +545,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // Patlamaları güncelle: animasyon karelerini ilerlet ve süresi dolanları sil
     private void updateExplosions() {
         if (explosions == null) {
             return;
@@ -598,8 +559,6 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // Powerup'ları güncelle: oyuncuyla çakışma kontrolü ve süresi dolanıları
-    // temizle
     private void updatePowerups() {
         if (powerups == null) {
             return;
@@ -607,18 +566,15 @@ public class GamePanel extends JPanel implements Runnable {
         Iterator<Powerup> it = powerups.iterator();
         while (it.hasNext()) {
             Powerup pu = it.next();
-            // Oyuncu powerup'a değdi mi?
             if (player.getBounds().intersects(pu.getBounds())) {
                 applyPowerup(pu.getType());
                 it.remove();
             } else if (pu.isExpired()) {
-                // 30 saniye doldu, powerup yok olur
                 it.remove();
             }
         }
     }
 
-    // Düşman öldürülünce %40 ihtimalle bir powerup bırak
     private void trySpawnPowerup(int x, int y) {
         Random rng = new Random();
         if (rng.nextInt(100) < 40) {
@@ -628,23 +584,17 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // Toplanan powerup'u uygula
     private void applyPowerup(PowerupType type) {
         if (type == PowerupType.SHIELD) {
-            // 8 saniye kalkan ver
             player.activateShield(8000);
         } else if (type == PowerupType.FREEZE) {
-            // Tüm düşmanları 6 saniye dondur
             enemiesFrozen = true;
             freezeEndTime = System.currentTimeMillis() + 6000;
         } else if (type == PowerupType.SHOVEL) {
-            // Üssün etrafını 15 saniye çeliğe çevir
             applyShovel();
         } else if (type == PowerupType.STAR) {
-            // Yıldız seviyesini kalıcı olarak yükseltir (max 3)
             player.collectStar();
         } else if (type == PowerupType.GRENADE) {
-            // Ekrandaki tüm düşmanları yok et
             int killedByGrenade = enemies.size();
             enemies.clear();
             enemiesKilled += killedByGrenade;
@@ -652,7 +602,6 @@ public class GamePanel extends JPanel implements Runnable {
                 listener.onScoreChanged(getScore());
             }
         } else if (type == PowerupType.LIFE) {
-            // +1 can
             player.lives++;
             if (listener != null) {
                 listener.onLivesChanged(player.lives);
@@ -660,19 +609,15 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    // Üssün etrafındaki tuğlaları geçici olarak çeliğe dönüştür
     private void applyShovel() {
         int baseX = playerBase.getX();
         int baseY = playerBase.getY();
-        // Üss çevresindeki koordinatları tanımlıyoruz (16px blok boyutunda, üs
-        // 32x32'dir)
         int[][] positions = {
                 { baseX - 16, baseY - 16 }, { baseX, baseY - 16 }, { baseX + 16, baseY - 16 },
                 { baseX + 32, baseY - 16 },
                 { baseX - 16, baseY }, { baseX + 32, baseY },
                 { baseX - 16, baseY + 16 }, { baseX + 32, baseY + 16 }
         };
-        // Mevcut tuğlaları sil, yerine çelik koy
         Iterator<GameObject> it = obstacles.iterator();
         while (it.hasNext()) {
             GameObject obj = it.next();
@@ -686,13 +631,12 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
         for (int[] pos : positions) {
-            obstacles.add(new SteelWall(pos[0], pos[1], 16, 16, true)); // shovelWall=true
+            obstacles.add(new SteelWall(pos[0], pos[1], 16, 16, true));
         }
         shovelActive = true;
-        shovelEndTime = System.currentTimeMillis() + 15000; // 15 saniye
+        shovelEndTime = System.currentTimeMillis() + 15000;
     }
 
-    // Shovel süresi dolunca eklenen geçici çelik duvarları kaldır
     private void removeShovelWalls() {
         Iterator<GameObject> it = obstacles.iterator();
         while (it.hasNext()) {
@@ -710,20 +654,17 @@ public class GamePanel extends JPanel implements Runnable {
         if (enemies.size() + spawnIndicators.size() < 3 && enemiesSpawned < 20) {
             long currentTime = System.currentTimeMillis();
 
-            // Seçilen zorluk derecesine göre temel doğuş sıklığı
             int baseSpawnInterval = 2000;
             if (difficulty == Difficulty.EASY) {
-                baseSpawnInterval = 3000; // 3 saniye
+                baseSpawnInterval = 3000;
             } else if (difficulty == Difficulty.MEDIUM) {
-                baseSpawnInterval = 2000; // 2 saniye
+                baseSpawnInterval = 2000;
             } else if (difficulty == Difficulty.HARD) {
-                baseSpawnInterval = 1500; // 1.5 saniye
+                baseSpawnInterval = 1500;
             }
 
-            // Bölüm ilerledikçe doğuş gecikmesini azaltıyoruz (düşmanların daha sık doğması
-            // için)
-            int stageBonus = (currentLevel - 1) * 250; // Her stage için 250 ms düşüş
-            int finalSpawnInterval = Math.max(800, baseSpawnInterval - stageBonus); // En düşük 800 ms olabilir
+            int stageBonus = (currentLevel - 1) * 250;
+            int finalSpawnInterval = Math.max(800, baseSpawnInterval - stageBonus);
 
             if (currentTime - lastSpawnTime >= finalSpawnInterval) {
                 lastSpawnTime = currentTime;
@@ -775,7 +716,7 @@ public class GamePanel extends JPanel implements Runnable {
         bullets.clear();
         enemiesKilled = 0;
         enemiesSpawned = 0;
-        levelStartDelayTime = System.currentTimeMillis() + 1000; // Yeni seviye yüklenince 1 saniye bekletiyoruz
+        levelStartDelayTime = System.currentTimeMillis() + 1000;
 
         if (enemies == null)
             enemies = new ArrayList<>();
@@ -793,15 +734,13 @@ public class GamePanel extends JPanel implements Runnable {
             explosions = new ArrayList<>();
         explosions.clear();
 
-        isVictory = false; // Seviye yüklenirken sıfırla
+        isVictory = false;
 
-        // Üssün hasar durumunu sıfırla
         playerBase.isDestroyed = false;
 
-        // Powerup yan etkilerini sıfırla
         enemiesFrozen = false;
         shovelActive = false;
-        player.resetStarLevel(); // Bölüm başlayınca yıldız seviyesi sıfırlanır
+        player.resetStarLevel();
 
         if (listener != null) {
             if (isCustomMap) {
@@ -813,7 +752,7 @@ public class GamePanel extends JPanel implements Runnable {
         player.x = 128;
         player.y = 384;
         player.setDirection(Direction.UP);
-        player.activateShield(3000); // Bölüm başlayınca 3 saniye kalkan verilir
+        player.activateShield(3000);
         String currentMap;
         if (isCustomMap) {
             currentMap = customMapPath;
@@ -872,25 +811,22 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     private void saveScore() {
-        // Swing Event Thread'ini kilitlemeden 2 saniye beklemek için yeni bir iş
-        // parçacığı (Thread) başlatıyoruz
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
-                    Thread.sleep(2000); // 2 saniye bekletiyoruz
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                // Gecikme bittikten sonra dialogu Swing EDT üzerinde açıyoruz
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         String name = JOptionPane.showInputDialog(GamePanel.this, "Game Over! Enter your name:", "Save",
                                 JOptionPane.PLAIN_MESSAGE);
                         if (name != null && !name.isEmpty()) {
-                            try (FileWriter fw = new FileWriter("scores.csv", true)) { // true = dosyanın sonuna ekle
+                            try (FileWriter fw = new FileWriter("scores.csv", true)) {
                                 fw.write(name + "," + getScore() + "\n");
                             } catch (IOException e) {
                                 System.out.println("File couldn't be written.");

@@ -16,16 +16,12 @@ public class BrickWall extends Wall {
     public Rectangle getBounds() {
         if (durability == 1 && hitDirection != null) {
             if (hitDirection == Direction.UP) {
-                // Aşağısı kırıldı, üst yarısı kaldı
                 return new Rectangle(x, y, width, height / 2);
             } else if (hitDirection == Direction.DOWN) {
-                // Yukarısı kırıldı, alt yarısı kaldı
                 return new Rectangle(x, y + height / 2, width, height / 2);
             } else if (hitDirection == Direction.LEFT) {
-                // Sağ tarafı kırıldı, sol yarısı kaldı
                 return new Rectangle(x, y, width / 2, height);
             } else if (hitDirection == Direction.RIGHT) {
-                // Sol tarafı kırıldı, sağ yarısı kaldı
                 return new Rectangle(x + width / 2, y, width / 2, height);
             }
         }

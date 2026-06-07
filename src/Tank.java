@@ -2,11 +2,10 @@ public abstract class Tank extends GameObject {
     protected int speed;
     protected Direction direction;
     
-    // Palet animasyonu değişkenleri
     protected boolean isMoving = false;
     protected int animFrame = 0;
     protected long lastAnimTime = 0;
-    protected static final long ANIM_DELAY_MS = 60; // 60 ms aralıklarla palet değişir
+    protected static final long ANIM_DELAY_MS = 60;
 
     public Tank(int x, int y, int width, int height, int speed, Direction currentDirection) {
         super(x, y, width, height);
@@ -29,7 +28,6 @@ public abstract class Tank extends GameObject {
         }
     }
 
-    // Tank hareket halindeyken palet karelerini sırayla değiştirir (toggle)
     public void updateAnimation() {
         if (isMoving) {
             long currentTime = System.currentTimeMillis();
@@ -59,7 +57,7 @@ public abstract class Tank extends GameObject {
     public void setMoving(boolean moving) {
         this.isMoving = moving;
         if (!moving) {
-            this.animFrame = 0; // Durduğunda ilk kareye döner
+            this.animFrame = 0;
         }
     }
 

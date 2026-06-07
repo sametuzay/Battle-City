@@ -3,14 +3,13 @@ import java.util.Random;
 public class EnemyTank extends Tank {
     private Random random;
     private long lastShootTime;
-    private int shootInterval; // Ateş kontrol aralığı (milisaniye cinsinden)
-    private int shootChance; // Ateş etme olasılığı (yüzde bazında, 1-100 arası)
-    private int bulletSpeed = 6; // Standart düşman mermi hızı
+    private int shootInterval;
+    private int shootChance;
+    private int bulletSpeed = 6;
 
     public EnemyTank(int x, int y, Difficulty difficulty, int stageLevel) {
         super(x, y, 32, 32, 1, Direction.DOWN);
 
-        // Seçilen zorluk seviyesine göre temel değerler ayarlanır
         int baseSpeed = 1;
         int baseShootInterval = 600;
         int baseShootChance = 50;
@@ -18,30 +17,27 @@ public class EnemyTank extends Tank {
         if (difficulty == Difficulty.EASY) {
             baseSpeed = 1;
             baseShootInterval = 800;
-            baseShootChance = 30; // %30 ateş şansı
+            baseShootChance = 30;
         } else if (difficulty == Difficulty.MEDIUM) {
             baseSpeed = 1;
             baseShootInterval = 600;
-            baseShootChance = 50; // %50 ateş şansı
+            baseShootChance = 50;
         } else if (difficulty == Difficulty.HARD) {
             baseSpeed = 2;
             baseShootInterval = 450;
-            baseShootChance = 65; // %65 ateş şansı
+            baseShootChance = 65;
         }
 
-        // Harita (stage) ilerledikçe zorluk artışı (her stage için abartısız bonuslar)
-        int stageBonus = stageLevel - 1; // Stage 1 = 0, Stage 2 = 1, Stage 3 = 2
+        int stageBonus = stageLevel - 1;
 
-        // Stage ilerledikçe hız artırılır (maksimum hız 2 ile sınırlandırılır)
         int speedBonus = 0;
         if (stageBonus > 0) {
             speedBonus = 1;
         }
         this.speed = Math.min(2, baseSpeed + speedBonus);
 
-        // Stage ilerledikçe ateş etme sıklığı ve olasılığı artırılır
-        this.shootInterval = Math.max(250, baseShootInterval - (stageBonus * 75)); // Her stage için aralık 75 ms kısalır
-        this.shootChance = Math.min(85, baseShootChance + (stageBonus * 10));     // Her stage için olasılık %10 artar
+        this.shootInterval = Math.max(250, baseShootInterval - (stageBonus * 75));
+        this.shootChance = Math.min(85, baseShootChance + (stageBonus * 10));
 
         this.random = new Random();
         this.lastShootTime = System.currentTimeMillis();
@@ -51,7 +47,6 @@ public class EnemyTank extends Tank {
     protected Bullet fireBullet() {
         int bulletX = this.x + (this.width / 2);
         int bulletY = this.y + (this.height / 2);
-        // Standart hızda düşman mermisi fırlatır (çelik kıramaz=false)
         return new Bullet(bulletX, bulletY, this.direction, true, this.bulletSpeed, false);
     }
 
@@ -59,7 +54,6 @@ public class EnemyTank extends Tank {
         int choice = random.nextInt(100);
 
         if (choice < 70) {
-            // %70 ihtimalle üsse doğru yönel
             int diffX = baseX - this.x;
             int diffY = baseY - this.y;
 
@@ -77,7 +71,6 @@ public class EnemyTank extends Tank {
                 }
             }
         } else if (choice < 85) {
-            // %15 ihtimalle oyuncuya doğru yönel
             int diffX = playerX - this.x;
             int diffY = playerY - this.y;
 
@@ -95,7 +88,6 @@ public class EnemyTank extends Tank {
                 }
             }
         } else {
-            // %15 ihtimalle tamamen rastgele yön seç
             int dir = random.nextInt(4);
             if (dir == 0) {
                 this.direction = Direction.UP;
@@ -109,13 +101,13 @@ public class EnemyTank extends Tank {
         }
     }
 
-    // Eski metot imzalarını uyumluluk adına koruyoruz
+
     public void randomMovement(int baseX, int baseY) {
         randomMovement(baseX, baseY, this.x, this.y);
     }
 
     public void randomMovement() {
-        randomMovement(192, 384, this.x, this.y); // Varsayılan konumlar
+        randomMovement(192, 384, this.x, this.y);
     }
 
     public boolean shootTime() {

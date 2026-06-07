@@ -2,16 +2,15 @@ public class Bullet extends GameObject {
     protected int speed;
     protected Direction direction;
     public boolean isEnemy;
-    public boolean destroysSteel = false; // Çelik duvarları kırabilir mi?
+    public boolean destroysSteel = false;
 
     public Bullet(int x, int y, Direction direction, boolean isEnemy) {
         super(x, y, 8, 8);
-        this.speed = 6; // Varsayılan yavaş mermi hızı
+        this.speed = 6;
         this.direction = direction;
         this.isEnemy = isEnemy;
     }
 
-    // Yıldızlı oyuncu için gelişmiş constructor
     public Bullet(int x, int y, Direction direction, boolean isEnemy, int speed, boolean destroysSteel) {
         super(x, y, 8, 8);
         this.speed = speed;

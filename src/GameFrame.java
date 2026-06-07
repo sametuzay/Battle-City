@@ -19,7 +19,6 @@ public class GameFrame extends JFrame implements GameStateListener {
         setResizable(false);
         setLayout(new BorderLayout());
 
-        // Menü barını oluşturuyoruz
         menuBar = new JMenuBar();
         JMenu gameMenu = new JMenu("Game");
         JMenu helpMenu = new JMenu("Help");
@@ -53,7 +52,6 @@ public class GameFrame extends JFrame implements GameStateListener {
         infoPanel = new HUDPanel();
         gamePanel = new GamePanel(this);
 
-        // 1 grid (32 piksel) gri sınır çerçevesi için sarmalayıcı panel oluşturuyoruz
         gameContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {
             @Override
             protected void paintComponent(Graphics g) {
@@ -66,11 +64,10 @@ public class GameFrame extends JFrame implements GameStateListener {
         gameContainer.setBorder(BorderFactory.createEmptyBorder(32, 32, 32, 16));
         gameContainer.add(gamePanel);
 
-        // Doğrudan ana menüyü göstererek başlıyoruz
         showMainMenu();
 
         pack();
-        setLocationRelativeTo(null); // Ekran ortasında açılması için
+        setLocationRelativeTo(null);
         this.setVisible(true);
 
         gamePanel.startGameThread();
@@ -109,7 +106,6 @@ public class GameFrame extends JFrame implements GameStateListener {
         backToMenu.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Oyunu durdurup ana menüye dönüyoruz
                 showMainMenu();
             }
         });
@@ -185,16 +181,12 @@ public class GameFrame extends JFrame implements GameStateListener {
         });
     }
 
-    /**
-     * Orijinal NES tarzındaki Ana Menü panelini ekranda gösterir.
-     * Menü barını gizler.
-     */
     public void showMainMenu() {
         if (gamePanel != null) {
             gamePanel.stopGame();
         }
         getContentPane().removeAll();
-        setJMenuBar(null); // Ana menüdeyken üst menü barını gizliyoruz
+        setJMenuBar(null);
 
         mainMenuPanel = new MainMenuPanel(new MainMenuPanel.MenuSelectionListener() {
             @Override
@@ -216,20 +208,17 @@ public class GameFrame extends JFrame implements GameStateListener {
         add(mainMenuPanel, BorderLayout.CENTER);
         revalidate();
         repaint();
-        mainMenuPanel.requestFocusInWindow(); // Klavye odağını menüye veriyoruz
+        mainMenuPanel.requestFocusInWindow();
     }
 
-    /**
-     * Oyun ekranını gösterir. Menü barını tekrar görünür kılar.
-     */
     public void showGameScreen() {
         getContentPane().removeAll();
-        setJMenuBar(menuBar); // Menü barını tekrar görünür yapıyoruz
+        setJMenuBar(menuBar);
         add(gameContainer, BorderLayout.CENTER);
         add(infoPanel, BorderLayout.EAST);
         revalidate();
         repaint();
-        gamePanel.requestFocusInWindow(); // Klavye odağını oyuna veriyoruz
+        gamePanel.requestFocusInWindow();
     }
 
     private void triggerNewGame() {
@@ -388,7 +377,6 @@ public class GameFrame extends JFrame implements GameStateListener {
         }
     }
 
-    // Retro arcade tarzı spriteları çizmek için özel HUD paneli sınıfı
     private class HUDPanel extends JPanel {
         public HUDPanel() {
             setPreferredSize(new Dimension(64, 480));
@@ -399,17 +387,15 @@ public class GameFrame extends JFrame implements GameStateListener {
         protected void paintComponent(Graphics g) {
             super.paintComponent(g);
 
-            // Arka planı doğrudan sprite'taki gri renk dokusuyla kaplıyoruz
             if (ImageLoader.hudBgPattern != null) {
                 g.drawImage(ImageLoader.hudBgPattern, 0, 0, getWidth(), getHeight(), null);
             }
 
-            int startX = 16; // 64 piksel genişliğindeki dar panel için ortalıyoruz
+            int startX = 16;
 
-            // 1. Düşman tankları göstergesi (Kalan düşmanlar)
             int remainingEnemies = 20 - (gamePanel != null ? gamePanel.getEnemiesKilled() : 0);
             int enemyStartY = 20;
-            int iconSize = 16; // 8x8 sprite'ı 2x ölçekliyoruz
+            int iconSize = 16;
             int gap = 4;
             for (int i = 0; i < remainingEnemies; i++) {
                 int row = i / 2;
@@ -421,39 +407,31 @@ public class GameFrame extends JFrame implements GameStateListener {
                 }
             }
 
-            // 2. IP (Player 1) Göstergesi
             int ipY = 240;
             if (ImageLoader.ipSign != null) {
-                g.drawImage(ImageLoader.ipSign, startX, ipY, 32, 16, null); // 16x8 -> 32x16
+                g.drawImage(ImageLoader.ipSign, startX, ipY, 32, 16, null);
             }
             int playerIconY = ipY + 20;
             if (ImageLoader.playerIcon != null) {
-                g.drawImage(ImageLoader.playerIcon, startX, playerIconY, 16, 16, null); // 8x8 -> 16x16
+                g.drawImage(ImageLoader.playerIcon, startX, playerIconY, 16, 16, null);
             }
             int lives = (gamePanel != null && gamePanel.getPlayer() != null) ? gamePanel.getPlayer().lives : 3;
             g.setColor(Color.BLACK);
             g.setFont(new Font("Monospaced", Font.BOLD, 16));
             g.drawString(String.valueOf(lives), startX + 20, playerIconY + 13);
 
-            // 3. Bölüm (Stage) Bayrak Göstergesi
-            // Bayrağı biraz daha aşağı alarak orijinal aralıklara sadık kalıyoruz
             int flagY = playerIconY + 45;
             if (ImageLoader.flagIcon != null) {
-                g.drawImage(ImageLoader.flagIcon, startX, flagY, 32, 32, null); // 16x16 -> 32x32
+                g.drawImage(ImageLoader.flagIcon, startX, flagY, 32, 32, null);
             }
 
-            // Bayrak görselinin sağ altındaki gömülü "1" rakamını temizlemek için HUD arka
-            // plan deseniyle kaplıyoruz
             if (ImageLoader.hudBgPattern != null) {
                 g.drawImage(ImageLoader.hudBgPattern, startX + 16, flagY + 16, 16, 16, null);
             }
 
-            // Seviye numarasını bayrağın sağ alt çeyreğine (direğin yanına, bayrağın
-            // altına) çiziyoruz
             int level = (gamePanel != null) ? gamePanel.getCurrentLevel() : 1;
             g.drawString(String.valueOf(level), startX + 18, flagY + 30);
 
-            // 4. Skor Göstergesi (PTS)
             int scoreY = flagY + 65;
             g.setFont(new Font("Monospaced", Font.BOLD, 12));
             g.drawString("PTS", startX, scoreY);
