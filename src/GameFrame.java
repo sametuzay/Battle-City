@@ -52,7 +52,7 @@ public class GameFrame extends JFrame implements GameStateListener {
         infoPanel = new HUDPanel();
         gamePanel = new GamePanel(this);
 
-        gameContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {
+        gameContainer = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0)) {// neden flowlayout kullandık
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -66,11 +66,11 @@ public class GameFrame extends JFrame implements GameStateListener {
 
         showMainMenu();
 
-        pack();
+        pack();// Napıyor
         setLocationRelativeTo(null);
         this.setVisible(true);
 
-        gamePanel.startGameThread();
+        gamePanel.startGameThread();// neden burda çağırılıyor
 
         exitItem.addActionListener(new ActionListener() {
             @Override
@@ -129,14 +129,13 @@ public class GameFrame extends JFrame implements GameStateListener {
             public void actionPerformed(ActionEvent e) {
                 String[] diffOptions = { "Easy", "Medium", "Hard" };
                 String selection = (String) JOptionPane.showInputDialog(
-                        GameFrame.this,
+                        GameFrame.this, // bu neden yazılıyo mesela
                         "Select Game Difficulty:",
                         "Options - Difficulty",
                         JOptionPane.QUESTION_MESSAGE,
                         null,
                         diffOptions,
-                        "Medium"
-                );
+                        "Medium");
 
                 if (selection != null) {
                     Difficulty diff = Difficulty.MEDIUM;
@@ -145,7 +144,7 @@ public class GameFrame extends JFrame implements GameStateListener {
                     } else if (selection.equals("Hard")) {
                         diff = Difficulty.HARD;
                     }
-                    showGameScreen();
+                    showGameScreen();// bu neden
                     if (gamePanel.isCustomMap()) {
                         gamePanel.startCustomGame(diff, gamePanel.getCustomMapPath());
                     } else {
@@ -176,12 +175,13 @@ public class GameFrame extends JFrame implements GameStateListener {
                         + "- Clock: Freezes all enemies for a period of time.\n"
                         + "- Shovel: Places steel walls around the base temporarily.\n"
                         + "- Shield: Makes player invulnerable to damage for a period of time.";
-                JOptionPane.showMessageDialog(GameFrame.this, helpText, "Help - How to Play", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(GameFrame.this, helpText, "Help - How to Play",
+                        JOptionPane.INFORMATION_MESSAGE);
             }
         });
     }
 
-    public void showMainMenu() {
+    public void showMainMenu() {// bu ne
         if (gamePanel != null) {
             gamePanel.stopGame();
         }
@@ -211,12 +211,12 @@ public class GameFrame extends JFrame implements GameStateListener {
         mainMenuPanel.requestFocusInWindow();
     }
 
-    public void showGameScreen() {
+    public void showGameScreen() {// bu ne işe yarıyo
         getContentPane().removeAll();
         setJMenuBar(menuBar);
         add(gameContainer, BorderLayout.CENTER);
         add(infoPanel, BorderLayout.EAST);
-        revalidate();
+        revalidate();// bu ne
         repaint();
         gamePanel.requestFocusInWindow();
     }
@@ -230,8 +230,7 @@ public class GameFrame extends JFrame implements GameStateListener {
                 JOptionPane.QUESTION_MESSAGE,
                 null,
                 options,
-                "Medium"
-        );
+                "Medium");
 
         if (selection != null) {
             Difficulty diff = Difficulty.MEDIUM;
@@ -252,8 +251,7 @@ public class GameFrame extends JFrame implements GameStateListener {
                 GameFrame.this,
                 "Enter custom map file name to load (e.g., custom_map.txt):",
                 "Load Custom Map",
-                JOptionPane.QUESTION_MESSAGE
-        );
+                JOptionPane.QUESTION_MESSAGE);
 
         if (fileName != null && !fileName.isEmpty()) {
             File file = new File(fileName);
@@ -262,8 +260,7 @@ public class GameFrame extends JFrame implements GameStateListener {
                         GameFrame.this,
                         "File does not exist!",
                         "Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                        JOptionPane.ERROR_MESSAGE);
                 if (mainMenuPanel != null) {
                     mainMenuPanel.requestFocusInWindow();
                 }
@@ -278,8 +275,7 @@ public class GameFrame extends JFrame implements GameStateListener {
                     JOptionPane.QUESTION_MESSAGE,
                     null,
                     options,
-                    "Medium"
-            );
+                    "Medium");
 
             if (selection != null) {
                 Difficulty diff = Difficulty.MEDIUM;
@@ -299,10 +295,10 @@ public class GameFrame extends JFrame implements GameStateListener {
     }
 
     private void triggerMapEditor() {
-        MapEditor editor = new MapEditor(GameFrame.this);
+        MapEditor editor = new MapEditor(GameFrame.this);// neden içinde gameframe.this var
         editor.setVisible(true);
-        if (mainMenuPanel != null) {
-            mainMenuPanel.requestFocusInWindow();
+        if (mainMenuPanel != null) {// bu ne işe yarıyo
+            mainMenuPanel.requestFocusInWindow();// bu ne işe yarıyo
         }
     }
 
@@ -310,7 +306,7 @@ public class GameFrame extends JFrame implements GameStateListener {
         StringBuilder scoreText = new StringBuilder("=== HIGH SCORES ===\n\n");
         try {
             File file = new File("scores.csv");
-            if (!file.exists()) {
+            if (!file.exists()) {// neden ifin içi ! var, mantıken doluysa çalışması gerekmez mi?
                 JOptionPane.showMessageDialog(GameFrame.this, "No recorded scores.", "High Scores",
                         JOptionPane.INFORMATION_MESSAGE);
                 if (mainMenuPanel != null) {
@@ -331,12 +327,12 @@ public class GameFrame extends JFrame implements GameStateListener {
 
             java.util.Collections.sort(scoreLines, new ScoreComparator());
 
-            int limit = Math.min(10, scoreLines.size());
+            int limit = Math.min(10, scoreLines.size());// math kullanımını araştırmalıyız
             for (int i = 0; i < limit; i++) {
                 String[] parts = scoreLines.get(i).split(",");
                 if (parts.length == 2) {
                     scoreText.append((i + 1)).append(". Player: ").append(parts[0])
-                            .append(" | Score: ").append(parts[1]).append("\n");
+                            .append(" | Score: ").append(parts[1]).append("\n");// append nedir neden kullanılır burada
                 }
             }
 
@@ -393,7 +389,11 @@ public class GameFrame extends JFrame implements GameStateListener {
 
             int startX = 16;
 
-            int remainingEnemies = 20 - (gamePanel != null ? gamePanel.getEnemiesKilled() : 0);
+            int remainingEnemies = 20 - (gamePanel != null ? gamePanel.getEnemiesKilled() : 0);// bu usage neden var
+                                                                                               // burda amk neyse gitti
+                                                                                               // artık, bu ? :
+                                                                                               // usage'ını çözemem
+                                                                                               // lazım anla
             int enemyStartY = 20;
             int iconSize = 16;
             int gap = 4;
@@ -415,7 +415,9 @@ public class GameFrame extends JFrame implements GameStateListener {
             if (ImageLoader.playerIcon != null) {
                 g.drawImage(ImageLoader.playerIcon, startX, playerIconY, 16, 16, null);
             }
-            int lives = (gamePanel != null && gamePanel.getPlayer() != null) ? gamePanel.getPlayer().lives : 3;
+            int lives = (gamePanel != null && gamePanel.getPlayer() != null) ? gamePanel.getPlayer().lives : 3;// bunuda
+                                                                                                               // anlamamız
+                                                                                                               // lazm
             g.setColor(Color.BLACK);
             g.setFont(new Font("Monospaced", Font.BOLD, 16));
             g.drawString(String.valueOf(lives), startX + 20, playerIconY + 13);
@@ -429,13 +431,13 @@ public class GameFrame extends JFrame implements GameStateListener {
                 g.drawImage(ImageLoader.hudBgPattern, startX + 16, flagY + 16, 16, 16, null);
             }
 
-            int level = (gamePanel != null) ? gamePanel.getCurrentLevel() : 1;
+            int level = (gamePanel != null) ? gamePanel.getCurrentLevel() : 1;// bu da aynı
             g.drawString(String.valueOf(level), startX + 18, flagY + 30);
 
             int scoreY = flagY + 65;
             g.setFont(new Font("Monospaced", Font.BOLD, 12));
             g.drawString("PTS", startX, scoreY);
-            int score = (gamePanel != null) ? gamePanel.getScore() : 0;
+            int score = (gamePanel != null) ? gamePanel.getScore() : 0; // bu da yine
             g.drawString(String.valueOf(score), startX, scoreY + 15);
         }
     }

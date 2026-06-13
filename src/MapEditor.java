@@ -20,7 +20,7 @@ public class MapEditor extends JDialog {
 
     public MapEditor(Frame owner) {
         super(owner, "Map Editor", true);
-        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);// bunu öğren?
         setResizable(false);
         setLayout(new BorderLayout());
 
@@ -97,7 +97,7 @@ public class MapEditor extends JDialog {
             if (tileTypes[i] == selectedTile) {
                 paletteButtons[i].setBorder(new LineBorder(Color.RED, 2));
             } else {
-                paletteButtons[i].setBorder(UIManager.getBorder("Button.border"));
+                paletteButtons[i].setBorder(UIManager.getBorder("Button.border"));// bu napyıro mesela
             }
         }
     }
@@ -130,7 +130,7 @@ public class MapEditor extends JDialog {
                 return;
             }
             try {
-                Scanner scanner = new Scanner(fileToLoad);
+                Scanner scanner = new Scanner(fileToLoad);// bu nasıl çalışıyor?
                 for (int r = 0; r < 13; r++) {
                     for (int c = 0; c < 13; c++) {
                         if (scanner.hasNextInt()) {
@@ -154,11 +154,11 @@ public class MapEditor extends JDialog {
         if (fileName != null && !fileName.isEmpty()) {
             File fileToSave = new File(fileName);
             try {
-                PrintWriter writer = new PrintWriter(fileToSave);
+                PrintWriter writer = new PrintWriter(fileToSave);// bunu öğren mesela
                 for (int r = 0; r < 13; r++) {
-                    StringBuilder line = new StringBuilder();
+                    StringBuilder line = new StringBuilder();// bunu da öğren
                     for (int c = 0; c < 13; c++) {
-                        line.append(grid[r][c]);
+                        line.append(grid[r][c]);// yine append var bu ne öğren
                         if (c < 12) {
                             line.append(" ");
                         }
@@ -179,7 +179,8 @@ public class MapEditor extends JDialog {
             setPreferredSize(new Dimension(416, 416));
             setBackground(Color.BLACK);
 
-            MouseAdapter mouseHandler = new MouseAdapter() {
+            MouseAdapter mouseHandler = new MouseAdapter() {// burda neden unu kullandık mesela diyerlerinde handler
+                                                            // açmamıştık?
                 @Override
                 public void mousePressed(MouseEvent e) {
                     paintTileAt(e.getX(), e.getY());
@@ -201,7 +202,7 @@ public class MapEditor extends JDialog {
             for (int r = 0; r < 13; r++) {
                 for (int c = 0; c < 13; c++) {
                     int x = c * 32;
-                    int y = r * 32;
+                    int y = r * 32;// neden çarpıyoz mesela
 
                     int tile = grid[r][c];
 

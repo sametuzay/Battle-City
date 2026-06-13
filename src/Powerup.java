@@ -18,12 +18,12 @@ public class Powerup extends GameObject {
         return System.currentTimeMillis() - spawnTime > LIFETIME_MS;
     }
 
-    public boolean isVisible() {
+    public boolean isVisible() {// bunu anla
         long elapsed = System.currentTimeMillis() - spawnTime;
-        if (elapsed > LIFETIME_MS - 5000) {
+        if (elapsed > LIFETIME_MS - 5000) {// bunu anla
             return (elapsed / 100) % 2 == 0;
         }
-        return (elapsed / 200) % 2 == 0;
+        return (elapsed / 200) % 2 == 0;// bunu öğren
     }
 
     public int getSpriteIndex() {

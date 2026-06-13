@@ -1,7 +1,7 @@
 public abstract class Tank extends GameObject {
     protected int speed;
     protected Direction direction;
-    
+
     protected boolean isMoving = false;
     protected int animFrame = 0;
     protected long lastAnimTime = 0;
@@ -18,7 +18,7 @@ public abstract class Tank extends GameObject {
 
     public void move() {
         if (direction == Direction.UP) {
-            y -= speed;
+            y -= speed;// neden y x ten speed çıkartılıyo onu anlat
         } else if (direction == Direction.DOWN) {
             y += speed;
         } else if (direction == Direction.LEFT) {
@@ -28,7 +28,7 @@ public abstract class Tank extends GameObject {
         }
     }
 
-    public void updateAnimation() {
+    public void updateAnimation() {// bunu anla
         if (isMoving) {
             long currentTime = System.currentTimeMillis();
             if (currentTime - lastAnimTime >= ANIM_DELAY_MS) {

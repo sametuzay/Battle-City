@@ -71,7 +71,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                synchronized (GamePanel.this) {
+                synchronized (GamePanel.this) {// bütün synchronized kullanım sebeplerini öğren
                     int key = e.getKeyCode();
                     if (key == KeyEvent.VK_W || key == KeyEvent.VK_UP)
                         upPressed = true;
@@ -100,7 +100,7 @@ public class GamePanel extends JPanel implements Runnable {
 
             @Override
             public void keyReleased(KeyEvent e) {
-                synchronized (GamePanel.this) {
+                synchronized (GamePanel.this) {// key released içinde neden space yok?
                     int key = e.getKeyCode();
                     if (key == KeyEvent.VK_W || key == KeyEvent.VK_UP)
                         upPressed = false;
@@ -115,7 +115,7 @@ public class GamePanel extends JPanel implements Runnable {
         });
     }
 
-    public void startGameThread() {
+    public void startGameThread() {// THREAD mekanizmasının nasıl çalıştığını aşama aşama anlat
         gameThread = new Thread(this);
         gameThread.start();
     }
@@ -171,7 +171,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         synchronized (this) {
-            Iterator<SpawnIndicator> it = spawnIndicators.iterator();
+            Iterator<SpawnIndicator> it = spawnIndicators.iterator();// bunun sebebini tam anla bi
             while (it.hasNext()) {
                 SpawnIndicator si = it.next();
                 if (si.isExpired()) {
@@ -199,7 +199,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        super.paintComponent(g);// bunun mantuğunı tam öğrenelim.
         if (ImageLoader.spriteSheet == null)
             return;
 
@@ -234,7 +234,7 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
 
-            if (player != null) {
+            if (player != null) {// bunu nasıl animasyonlu yapıyo anlayalım
                 BufferedImage currentTankImage = ImageLoader.playerTank[player.getDirection().ordinal()][player
                         .getAnimFrame()];
                 g.drawImage(currentTankImage, player.getX(), player.getY(), player.getWidth(), player.getHeight(),
@@ -246,7 +246,7 @@ public class GamePanel extends JPanel implements Runnable {
                             player.getHeight() + 8, this);
                 }
             }
-            for (EnemyTank enemy : enemies) {
+            for (EnemyTank enemy : enemies) {// bunu nasıl animasyonlu yapıyo anlayalım.
                 BufferedImage enemyImage = ImageLoader.enemyTank[enemy.getDirection().ordinal()][enemy.getAnimFrame()];
                 g.drawImage(enemyImage, enemy.getX(), enemy.getY(), enemy.getWidth(), enemy.getHeight(), this);
             }
@@ -306,7 +306,7 @@ public class GamePanel extends JPanel implements Runnable {
     }
 
     @Override
-    public void run() {
+    public void run() {// mantığını anlayalım
         while (gameThread != null) {
             try {
                 update();
@@ -316,7 +316,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             try {
-                Thread.sleep(16);
+                Thread.sleep(16);// neden burada sleep var?
 
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -329,7 +329,7 @@ public class GamePanel extends JPanel implements Runnable {
         int nextY = tank.getY();
 
         if (dir == Direction.UP)
-            nextY -= tank.speed;
+            nextY -= tank.speed;// bu nasıl çalışıyo anla
         if (dir == Direction.DOWN)
             nextY += tank.speed;
         if (dir == Direction.LEFT)
@@ -337,11 +337,11 @@ public class GamePanel extends JPanel implements Runnable {
         if (dir == Direction.RIGHT)
             nextX += tank.speed;
 
-        int padding = 2;
+        int padding = 2;// olayını tam anla bunun
         Rectangle hitBox = new Rectangle(nextX + padding, nextY + padding, tank.getWidth() - 2 * padding,
                 tank.getHeight() - 2 * padding);
 
-        Rectangle currentBox = new Rectangle(tank.getX() + padding, tank.getY() + padding,
+        Rectangle currentBox = new Rectangle(tank.getX() + padding, tank.getY() + padding, // bu neden var?
                 tank.getWidth() - 2 * padding,
                 tank.getHeight() - 2 * padding);
 
@@ -362,7 +362,7 @@ public class GamePanel extends JPanel implements Runnable {
                 Rectangle enemyBox = new Rectangle(enemy.getX() + padding, enemy.getY() + padding,
                         enemy.getWidth() - 2 * padding, enemy.getHeight() - 2 * padding);
                 if (hitBox.intersects(enemyBox) || currentBox.intersects(enemyBox)) {
-                    return true;
+                    return true;// bura neyi kontrol ediyor?
                 }
             }
         } else if (tank instanceof EnemyTank) {
@@ -374,7 +374,7 @@ public class GamePanel extends JPanel implements Runnable {
                 }
             }
             for (EnemyTank otherEnemy : enemies) {
-                if (tank != otherEnemy) {
+                if (tank != otherEnemy) {// burda niye != denmiş anla
                     Rectangle otherBox = new Rectangle(otherEnemy.getX() + padding, otherEnemy.getY() + padding,
                             otherEnemy.getWidth() - 2 * padding, otherEnemy.getHeight() - 2 * padding);
                     // Düşmanlar birbirini kilitlemesin diye sadece ileri hitbox'a bakıyoruz.
@@ -386,7 +386,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
 
         if (nextX < 0 || nextX + tank.getWidth() > 416 || nextY < 0 || nextY + tank.getHeight() > 416) {
-            return true;
+            return true;// bunu anla
         }
 
         return false;
@@ -409,7 +409,7 @@ public class GamePanel extends JPanel implements Runnable {
             GameObject obstacleToRemove = null;
 
             if (!hit) {
-                for (Bullet bullet : bullets) {
+                for (Bullet bullet : bullets) {// bu tam olarak neye bakıyo anla ,niye b !=bullet var?
                     if (b != bullet && b.isEnemy != bullet.isEnemy && !bulletsToRemove.contains(bullet)) {
                         if (bBox.intersects(bullet.getBounds())) {
                             hit = true;
@@ -533,7 +533,7 @@ public class GamePanel extends JPanel implements Runnable {
             } else {
                 enemy.move();
                 enemy.setMoving(true);
-                if (rng.nextInt(100) < 1) {
+                if (rng.nextInt(100) < 1) {// bu neyi anlatıyo anla
                     enemy.randomMovement(baseX, baseY, player.getX(), player.getY());
                 }
             }
@@ -545,7 +545,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void updateExplosions() {
+    private void updateExplosions() {// bu nasıl çalışıyo anla
         if (explosions == null) {
             return;
         }
@@ -575,7 +575,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void trySpawnPowerup(int x, int y) {
+    private void trySpawnPowerup(int x, int y) {// nasıl çalışıyor anla
         Random rng = new Random();
         if (rng.nextInt(100) < 40) {
             PowerupType[] types = PowerupType.values();
@@ -588,7 +588,7 @@ public class GamePanel extends JPanel implements Runnable {
         if (type == PowerupType.SHIELD) {
             player.activateShield(8000);
         } else if (type == PowerupType.FREEZE) {
-            enemiesFrozen = true;
+            enemiesFrozen = true;// freezin nasıl başladığını anla
             freezeEndTime = System.currentTimeMillis() + 6000;
         } else if (type == PowerupType.SHOVEL) {
             applyShovel();
@@ -609,7 +609,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void applyShovel() {
+    private void applyShovel() {// bunun çalışmasını anlat
         int baseX = playerBase.getX();
         int baseY = playerBase.getY();
         int[][] positions = {
@@ -621,7 +621,7 @@ public class GamePanel extends JPanel implements Runnable {
         Iterator<GameObject> it = obstacles.iterator();
         while (it.hasNext()) {
             GameObject obj = it.next();
-            if (obj instanceof BrickWall) {
+            if (obj instanceof BrickWall) {// tam olarak napıyo bu anla
                 for (int[] pos : positions) {
                     if (obj.getX() == pos[0] && obj.getY() == pos[1]) {
                         it.remove();
@@ -637,7 +637,7 @@ public class GamePanel extends JPanel implements Runnable {
         shovelEndTime = System.currentTimeMillis() + 15000;
     }
 
-    private void removeShovelWalls() {
+    private void removeShovelWalls() {// bunu da anla
         Iterator<GameObject> it = obstacles.iterator();
         while (it.hasNext()) {
             GameObject obj = it.next();
@@ -664,7 +664,7 @@ public class GamePanel extends JPanel implements Runnable {
             }
 
             int stageBonus = (currentLevel - 1) * 250;
-            int finalSpawnInterval = Math.max(800, baseSpawnInterval - stageBonus);
+            int finalSpawnInterval = Math.max(800, baseSpawnInterval - stageBonus);// bunu anla neden math kullanmış
 
             if (currentTime - lastSpawnTime >= finalSpawnInterval) {
                 lastSpawnTime = currentTime;
@@ -679,7 +679,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    public synchronized void startNewGame(Difficulty selectedDifficulty) {
+    public synchronized void startNewGame(Difficulty selectedDifficulty) {// neden özellikle bu synch
         this.difficulty = selectedDifficulty;
         this.player.lives = 3;
         this.currentLevel = 1;
@@ -703,7 +703,7 @@ public class GamePanel extends JPanel implements Runnable {
         this.cumulativeScore = 0;
         this.isCustomMap = true;
         this.customMapPath = customMapPath;
-        loadLevel(-1);
+        loadLevel(-1);// bunun amacı ne
         if (listener != null) {
             listener.onLivesChanged(this.player.lives);
             listener.onLevelChanged(this.currentLevel);
@@ -711,7 +711,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private synchronized void loadLevel(int level) {
+    private synchronized void loadLevel(int level) {// neden bütün listler tekrar yapılıyo
         obstacles.clear();
         bullets.clear();
         enemiesKilled = 0;
@@ -810,7 +810,7 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
 
-    private void saveScore() {
+    private void saveScore() {// neden thread var bunda ayrı
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -820,25 +820,25 @@ public class GamePanel extends JPanel implements Runnable {
                     e.printStackTrace();
                 }
 
-                SwingUtilities.invokeLater(new Runnable() {
+                SwingUtilities.invokeLater(new Runnable() {// bu ne işe yarıyor?
                     @Override
                     public void run() {
                         String name = JOptionPane.showInputDialog(GamePanel.this, "Game Over! Enter your name:", "Save",
                                 JOptionPane.PLAIN_MESSAGE);
                         if (name != null && !name.isEmpty()) {
-                            try (FileWriter fw = new FileWriter("scores.csv", true)) {
+                            try (FileWriter fw = new FileWriter("scores.csv", true)) {// filewriter ne anla
                                 fw.write(name + "," + getScore() + "\n");
                             } catch (IOException e) {
                                 System.out.println("File couldn't be written.");
                             }
                         }
                         if (listener != null) {
-                            listener.onGameOver();
+                            listener.onGameOver();// bu ne oluyor tam?
                         }
                     }
                 });
             }
-        }).start();
+        }).start();// neden burda start
     }
 
 }

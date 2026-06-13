@@ -51,7 +51,7 @@ public class EnemyTank extends Tank {
     }
 
     public void randomMovement(int baseX, int baseY, int playerX, int playerY) {
-        int choice = random.nextInt(100);
+        int choice = random.nextInt(100);// bunu öğren kesin
 
         if (choice < 70) {
             int diffX = baseX - this.x;
@@ -100,7 +100,6 @@ public class EnemyTank extends Tank {
             }
         }
     }
-
 
     public void randomMovement(int baseX, int baseY) {
         randomMovement(baseX, baseY, this.x, this.y);

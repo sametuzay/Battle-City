@@ -1,5 +1,5 @@
 import java.awt.image.BufferedImage;
-import java.io.File;
+import java.io.File;// bunu anlatabiliyo olmam lazm
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
@@ -31,7 +31,8 @@ public class ImageLoader {
 
     public static void loadImages() {
         try {
-            spriteSheet = ImageIO.read(new File("ImagePack/Battle City - Miscellaneous - General Sprites-transparent.png"));
+            spriteSheet = ImageIO
+                    .read(new File("ImagePack/Battle City - Miscellaneous - General Sprites-transparent.png"));
             miscSheet = ImageIO.read(new File("ImagePack/Battle City - Miscellaneous - Miscellaneous.png"));
             loadPlayerTank();
             loadEnemyTank();
@@ -104,7 +105,6 @@ public class ImageLoader {
         spawnStar[2] = spriteSheet.getSubimage(288, 96, 16, 16);
         spawnStar[3] = spriteSheet.getSubimage(304, 96, 16, 16);
 
-        
         powerupSprites[0] = spriteSheet.getSubimage(256, 112, 16, 16);
         powerupSprites[1] = spriteSheet.getSubimage(272, 112, 16, 16);
         powerupSprites[2] = spriteSheet.getSubimage(288, 112, 16, 16);
